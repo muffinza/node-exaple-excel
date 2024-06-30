@@ -35,11 +35,21 @@ export const getExcel = (req: Request, res: Response) => {
   const data = req.body.result;
   const success = generalExcel(data);
 
-  //const data = req.body;
+  const tempData = data.map((e:any)=>{
+    return {
+      "รหัสร้าน":e.newStoreCode,
+      "ชื่อร้านสาขา":e.newStoreName,
+      "Zone":e.zone,
+      "ฝ่าย":e.storeDvName,
+      "เขต":e.storeMnName,
+      "วันที่เปิดปิด":e.openDate,
+      "สถานะ":e.wfStepName
+    }
+  })
 
     // Create a new workbook and worksheet
     const workbook = xlsx.utils.book_new();
-    const worksheet = xlsx.utils.json_to_sheet(data);
+    const worksheet = xlsx.utils.json_to_sheet(tempData);
 
     // Append the worksheet to the workbook
     xlsx.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
@@ -51,7 +61,8 @@ export const getExcel = (req: Request, res: Response) => {
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     
     // Set the Content-Disposition header to specify the filename
-    res.setHeader('Content-Disposition', 'attachment; filename=output.xlsx');
+    const name = Math.random().toString()
+    res.setHeader('Content-Disposition', `attachment; filename=${name}.xlsx`);
 
     // Send the buffer as the response
     res.send(buffer);
